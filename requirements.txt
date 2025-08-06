@@ -1,0 +1,11 @@
+fastapi == 0.115.11
+python-dotenv == 1.0.1
+pymongo == 4.13.2
+motor == 3.7.1
+passlib[bcrypt] ==  1.7.4
+python-jose[cryptography] == 3.5.0
+pydantic ==  2.10.6
+langchain ==  0.3.25
+langchain-openai == 0.3.28
+langgraph ==  0.2.72
+uvicorn[standard] == 0.29.0

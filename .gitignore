@@ -1,0 +1,5 @@
+__pycache__/
+Backend/__pycache__/
+WhisperAI/__pycache__/
+.env
+test.ipynb
