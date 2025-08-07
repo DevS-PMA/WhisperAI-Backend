@@ -1,4 +1,6 @@
 from pydantic import BaseModel, EmailStr
+from typing import Literal, Optional
+from datetime import datetime
 
 class userCreate (BaseModel):
     firstName: str
@@ -19,3 +21,16 @@ def serializeUserCreate (data: userCreate) -> dict:
         'email': data['email'],
         'password': data['password']
     }
+
+class ChatMessageIn(BaseModel):
+    thread_id: str
+    role: Literal["User", "AI"]
+    message: str
+
+class ChatMessageOut(BaseModel):
+    thread_id: str
+    user_id: str
+    role: Literal["User", "AI"]
+    message: str
+    timestamp: datetime
+    formatted_time: Optional[str] = None

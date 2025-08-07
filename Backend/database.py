@@ -13,3 +13,6 @@ db = client.data_collection
 
 #Creating a collection called table in SQL
 userData = db["UserData"]
+
+#Creating a collection called ChatData in SQL
+chatData = db["ChatData"]
