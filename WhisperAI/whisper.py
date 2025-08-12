@@ -5,11 +5,16 @@ from langchain_core.messages import SystemMessage, HumanMessage, AIMessage, Remo
 from .schema import messagesState
 from .prompt import summarizeMessagePrompt, responsePrompt
 from .llm import llm, messageSummary_llm
+from langgraph.checkpoint.mongodb.aio import AsyncMongoDBSaver
+from motor.motor_asyncio import AsyncIOMotorClient
+from pymongo.server_api import ServerApi
+from dotenv import load_dotenv
+import os
 
 
 
 
-def summarize_conversation (state: messagesState) -> messagesState:
+async def summarize_conversation (state: messagesState) -> messagesState:
     """
         This Function summarizes the conversation to minimize the token input to the LLM
     """
@@ -31,7 +36,7 @@ def summarize_conversation (state: messagesState) -> messagesState:
         )
 
         msg = msg.format (summary=summary_message, conversation=messages)
-        response = messageSummary_llm.invoke ([SystemMessage(content=summarizeMessagePrompt)] + HumanMessage(content=msg))
+        response = await messageSummary_llm.ainvoke ([SystemMessage(content=summarizeMessagePrompt)] + HumanMessage(content=msg))
 
         delete_messages = [RemoveMessage(id=m.id) for m in state['messages'][:-1]]
         return {'summary': response.summary, 'messages':delete_messages}
@@ -39,7 +44,7 @@ def summarize_conversation (state: messagesState) -> messagesState:
         return state
 
 
-def llm_call (state: messagesState) -> messagesState:
+async def llm_call (state: messagesState) -> messagesState:
     summary = state.get("summary", "")
 
     if summary:
@@ -48,11 +53,11 @@ def llm_call (state: messagesState) -> messagesState:
     else:
         system_message = SystemMessage (content=responsePrompt)
     messages = [system_message] + state["messages"]
-    response = llm.invoke (messages)
+    response = await llm.ainvoke (messages)
     return {"messages": response}
 
 
-def workflow () -> RunnableConfig:
+async def workflow () -> RunnableConfig:
     builder = StateGraph (messagesState)
     builder.add_node ("summarize", summarize_conversation)
     builder.add_node ("LLM", llm_call)
@@ -61,7 +66,11 @@ def workflow () -> RunnableConfig:
     builder.add_edge ("summarize", "LLM")
     builder.add_edge ("LLM", END)
 
-    memory = MemorySaver ()
-    graph = builder.compile (checkpointer=memory)
+    load_dotenv ()
+    mongodb_url = os.getenv("MONGODB_URL")
+    client = AsyncIOMotorClient(mongodb_url, server_api=ServerApi('1'))
+    memorydb = AsyncMongoDBSaver (client=client, db_name="LLM_Memory", checkpoint_collection_name="WhisperAI_Chat_Memory")
+    
+    graph = builder.compile (checkpointer=memorydb)
 
     return graph 
