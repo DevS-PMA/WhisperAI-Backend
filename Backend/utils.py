@@ -2,7 +2,7 @@ from passlib.context import CryptContext
 from jose import jwt, JWTError
 from fastapi.security import HTTPBearer, HTTPAuthorizationCredentials
 from fastapi import HTTPException, Depends, status
-from datetime import datetime, timedelta
+from datetime import datetime, timedelta, timezone
 from Backend.database import userData
 from Backend.schema import serializeUserCreate
 from bson import ObjectId
@@ -26,7 +26,7 @@ def verifyPassword (plainPassword: str, harshedPassword: str) -> bool:
 
 
 async def createToken (data: dict, expires: timedelta = None):
-    ex = datetime.utcnow () + (expires or timedelta(minutes=5))
+    ex = datetime.now (timezone.utc) + (expires or timedelta(hours=24))
     data.update ({"exp": ex})
     return jwt.encode (data, secretKey, algorithm=algorithm)
 
@@ -41,13 +41,16 @@ async def getCurrentUser (credential: HTTPAuthorizationCredentials = Depends(oau
 
     try:
         payload = jwt.decode (token=token, key=secretKey, algorithms=algorithm)
-        id: str = payload.get("id")
-        if id is None:
+        email: str = payload.get("email")
+        if email is None:
+            print ("Invalid Token")
             raise credentials_exception
 
-        user = await userData.find_one ({'_id': ObjectId(id)})
+        user = await userData.find_one ({'email': email})
         if not user:
+            print ("User ID not found")
             raise credentials_exception
         return serializeUserCreate (user)
     except JWTError:
+        print ("JWTError")
         raise credentials_exception

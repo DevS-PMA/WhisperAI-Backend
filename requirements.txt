@@ -6,6 +6,7 @@ passlib[bcrypt] ==  1.7.4
 python-jose[cryptography] == 3.5.0
 pydantic[email] ==  2.10.6
 langchain ==  0.3.25
+langchain-core == 0.3.69
 langchain-openai == 0.3.28
 langgraph ==  0.2.72
 uvicorn[standard] == 0.29.0
