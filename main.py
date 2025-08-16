@@ -1,4 +1,5 @@
 from fastapi import FastAPI
+from fastapi.middleware.cors import CORSMiddleware
 from Backend.auth_router import auth_router
 from Backend.chat_router import chat_router
 from WhisperAI.wishperWorkflow import init_whisper
@@ -7,6 +8,14 @@ app = FastAPI ()
 
 app.include_router(router=auth_router)
 app.include_router(router=chat_router)
+
+app.add_middleware(
+    CORSMiddleware,
+    allow_origins=["*"],      # 1
+    allow_credentials=True,   # 2
+    allow_methods=["*"],      # 3
+    allow_headers=["*"],      # 4
+)
 
 @app.on_event ("startup")
 async def startup_event ():
