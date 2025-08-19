@@ -31,7 +31,7 @@ async def chat_history (current_user: dict = Depends(getCurrentUser)):
     for thread in threads:
         thread_id = thread['thread_id']
 
-        message_cursor = chat_message_history.find ({'thread_id': thread_id}).sort('timeStamp', -1)
+        message_cursor = chat_message_history.find ({'thread_id': thread_id}).sort('timeStamp', 1)
         messages = await message_cursor.to_list (length=None)
 
         chatHistory.append ({

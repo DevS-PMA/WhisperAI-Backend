@@ -3,6 +3,7 @@ from .schema import MessageSummary, ThreadTitle
 import os
 from dotenv import load_dotenv
 
+load_dotenv ()
 os.environ["OPENAI_API_KEY"] = os.getenv("OPENAI_API_KEY")
 llm = ChatOpenAI (model="gpt-5")
 small_llm = ChatOpenAI (model="gpt-4.1-nano")
