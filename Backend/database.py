@@ -20,3 +20,5 @@ chatData = db["ChatData"]
 chat_thread = db['chat_thread']
 chat_message_history = db['chat_messages']
 anonymouse_chat_history = db['anonymouse_chat_history']
+
+journal_collection = db["journals"]
