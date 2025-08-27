@@ -11,3 +11,4 @@ langchain-openai == 0.3.28
 langgraph ==  0.2.72
 uvicorn[standard] == 0.29.0
 langgraph-checkpoint-mongodb == 0.1.4
+langgraph-store-mongodb == 0.0.1
