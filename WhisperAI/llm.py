@@ -1,12 +1,14 @@
 from langchain_openai import ChatOpenAI
-from .schema import MessageSummary, ThreadTitle
+from .schema import MessageSummary, ThreadTitle, ListIssues, Summarize
 import os
 from dotenv import load_dotenv
 
 load_dotenv ()
 os.environ["OPENAI_API_KEY"] = os.getenv("OPENAI_API_KEY")
-llm = ChatOpenAI (model="gpt-5")
-small_llm = ChatOpenAI (model="gpt-4.1-nano")
+llm = ChatOpenAI (model="gpt-5-nano")
+small_llm = ChatOpenAI (model="gpt-5-nano")
 
 messageSummary_llm = llm.with_structured_output (MessageSummary)
+summarize_llm = llm.with_structured_output (Summarize)
 thread_title_llm = small_llm.with_structured_output (ThreadTitle)
+store_llm = small_llm.with_structured_output (ListIssues)

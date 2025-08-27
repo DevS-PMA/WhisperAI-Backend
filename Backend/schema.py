@@ -54,6 +54,7 @@ class ChatMessageOut (BaseModel):
     title: str
     role: Literal['user', 'whisper']
     message: str
+    summarize: bool
     timeStamp: float
 
 class ChatMessageIn (BaseModel):
@@ -63,3 +64,30 @@ class ChatMessageIn (BaseModel):
     title: str
     timeStamp: float
     newThread: bool
+
+class JournalEntryIn (BaseModel):
+    field1: str
+    field2: str
+    field3: str
+    field4: str
+    timeStamp: float
+
+class JournalEntryOut (BaseModel):
+    journal_id: str
+    user_id: str
+    field1: str
+    field2: str
+    field3: str
+    field4: str
+    timeStamp: float
+
+def serializeJournal(data) -> dict:
+    return {
+        "journal_id": data["journal_id"],
+        "user_id": data["user_id"],
+        "field1": data["field1"],
+        "field2": data["field2"],
+        "field3": data["field3"],
+        "field4": data["field4"],
+        "timeStamp": data["timeStamp"]
+    }

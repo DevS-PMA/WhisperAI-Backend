@@ -3,11 +3,14 @@ from fastapi.middleware.cors import CORSMiddleware
 from Backend.auth_router import auth_router
 from Backend.chat_router import chat_router
 from WhisperAI.wishperWorkflow import init_whisper
+from Backend.journal_router import journal_router
 
 app = FastAPI ()
 
 app.include_router(router=auth_router)
 app.include_router(router=chat_router)
+
+app.include_router(router=journal_router)
 
 app.add_middleware(
     CORSMiddleware,

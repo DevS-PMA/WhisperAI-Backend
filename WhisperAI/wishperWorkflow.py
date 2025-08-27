@@ -1,6 +1,7 @@
 from WhisperAI.whisper import workflow
 from WhisperAI.llm import thread_title_llm
 from langchain_core.messages import HumanMessage
+from typing_extensions import Tuple
 import asyncio
 
 whisper = None
@@ -9,12 +10,14 @@ async def init_whisper ():
     whisper = await workflow ()
     return None
 
-async def userChat (userName: str, thread_id:str, message: str) -> str:
+async def userChat (userName: str, thread_id:str, message: str) -> Tuple[str, bool]:
     config = {'configurable': {'thread_id': thread_id}}
     msg = HumanMessage (content=message)
     response = await whisper.ainvoke ({'messages': [msg], 'userName': userName}, config=config)
-
-    return response['messages'][-1].content
+    if response['userSummary']:
+        return response['summary'], True
+    else:
+        return response['messages'][-1].content, False
 
 async def anonymousChat (thread_id:str, message: str) -> str:
     config = {'configurable': {'thread_id': thread_id}}
