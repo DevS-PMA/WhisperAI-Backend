@@ -1,6 +1,6 @@
 from fastapi import APIRouter, Depends, HTTPException, status
 from Backend.utils import getCurrentUser
-from Backend.database import chat_thread, chat_message_history, anonymouse_chat_history
+from Backend.database import chat_thread, chat_message_history, anonymouse_chat_history, chat_summary
 from WhisperAI.wishperWorkflow import userChat, anonymousChat, threadTitle
 from datetime import datetime, timezone
 from typing import List
@@ -52,6 +52,9 @@ async def chat_message (message: ChatMessageIn, current_user: dict = Depends(get
     if chat_thread is None:
         raise HTTPException (status_code=500, detail="DB connection not innitialized.")
     
+    if chat_summary is None:
+        raise HTTPException (status_code=500, detail="DB connection not innitialized.")
+    
     if message.newThread:
         thread_id = str (uuid4())
     else:
@@ -62,39 +65,81 @@ async def chat_message (message: ChatMessageIn, current_user: dict = Depends(get
 
     firstName = current_user['firstName']
     userMessage = message.message
-    response = await userChat (userName=firstName, message=userMessage, thread_id=thread_id)
+    response, summarize = await userChat (userName=firstName, message=userMessage, thread_id=thread_id)
 
-    if message.newThread:
-        thread_title = await threadTitle (msg=message.message)
-        thread = {
+    if summarize:
+        result = await chat_thread.update_one ({'thread_id': thread_id}, {"$set": {"timeStamp": datetime.now(timezone.utc).timestamp(), 'summarize': True}})
+        summary = {
             'user_id': current_user['id'],
             'thread_id': thread_id,
-            'title': thread_title,
-            'timeStamp': message.timeStamp
+            'title': message.title,
+            'summary': response,
+            'timeStamp': datetime.now(timezone.utc).timestamp()
         }
-        result = await chat_thread.insert_one (thread)
+        await chat_summary.insert_one (summary)
+
+        AI_MM = {
+            'thread_id': thread_id,
+            'title': message.title,
+            'role': 'whisper',
+            'message': response,
+            'summarize': True,
+            'timeStamp': datetime.now(timezone.utc).timestamp()
+        }
+        return AI_MM
 
     else:
-        result = await chat_thread.update_one ({'thread_id': thread_id}, {"$set": {"timeStamp": datetime.now(timezone.utc).timestamp()}}) #Update timeStamp in thread_id
-        thread_title = message.title
+        if message.newThread:
+            thread_title = await threadTitle (msg=message.message)
+            thread = {
+                'user_id': current_user['id'],
+                'thread_id': thread_id,
+                'title': thread_title,
+                'summarize': False,
+                'timeStamp': message.timeStamp
+            }
+            result = await chat_thread.insert_one (thread)
 
-    message.role = "user"
-    message.thread_id = thread_id
-    userMM = message.model_dump (exclude={'newthread'})
-    result = await chat_message_history.insert_one (userMM)
+        else:
+            result = await chat_thread.update_one ({'thread_id': thread_id}, {"$set": {"timeStamp": datetime.now(timezone.utc).timestamp()}}) #Update timeStamp in thread_id
+            thread_title = message.title
 
-    timeStamp = datetime.now(timezone.utc).timestamp()
-    AI_MM = {
-        'thread_id': thread_id,
-        'title': thread_title,
-        'role': 'whisper',
-        'message': response,
-        'timeStamp': timeStamp
-    }
+        message.role = "user"
+        message.thread_id = thread_id
+        userMM = message.model_dump (exclude={'newthread'})
+        result = await chat_message_history.insert_one (userMM)
 
-    result = await chat_message_history.insert_one (AI_MM)
+        timeStamp = datetime.now(timezone.utc).timestamp()
+        AI_MM = {
+            'thread_id': thread_id,
+            'title': thread_title,
+            'role': 'whisper',
+            'message': response,
+            'timeStamp': timeStamp
+        }
 
-    return AI_MM
+        result = await chat_message_history.insert_one (AI_MM)
+        AI_MM['summarize'] = False
+
+        return AI_MM
+
+@chat_router.get ("/summary")
+async def get_chat_summary (current_user: dict = Depends(getCurrentUser)):
+    if chat_summary is None:
+        raise HTTPException (status_code=500, detail="DB connection not innitialized.")
+    
+    user_id = current_user['id']
+    summary_cursor = chat_summary.find ({'user_id': user_id}).sort ('timeStamp', -1)
+    summary = await summary_cursor.to_list (length=None)
+    summary_cc = [
+        {
+            'thread_id': s['thread_id'],
+            'title': s['title'],
+            'summary': s['summary'],
+            'timeStamp': s['timeStamp']
+        } for s in summary
+    ]
+    return {'summary': summary_cc}
 
 @chat_router.post ("/anonymous", response_model=ChatMessageOut)
 async def anonymous_chat (message: ChatMessageIn):

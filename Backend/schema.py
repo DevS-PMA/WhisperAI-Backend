@@ -54,6 +54,7 @@ class ChatMessageOut (BaseModel):
     title: str
     role: Literal['user', 'whisper']
     message: str
+    summarize: bool
     timeStamp: float
 
 class ChatMessageIn (BaseModel):

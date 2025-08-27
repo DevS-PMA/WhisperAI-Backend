@@ -2,5 +2,6 @@ __pycache__/
 Backend/__pycache__/
 WhisperAI/__pycache__/
 Prompt test/
+WhisperAI/store.py
 .env
 test.ipynb
