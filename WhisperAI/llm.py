@@ -5,8 +5,8 @@ from dotenv import load_dotenv
 
 load_dotenv ()
 os.environ["OPENAI_API_KEY"] = os.getenv("OPENAI_API_KEY")
-llm = ChatOpenAI (model="gpt-5-nano")
-small_llm = ChatOpenAI (model="gpt-5-nano")
+llm = ChatOpenAI (model="gpt-4.1-nano")
+small_llm = ChatOpenAI (model="gpt-4.1-nano")
 
 messageSummary_llm = llm.with_structured_output (MessageSummary)
 summarize_llm = llm.with_structured_output (Summarize)
