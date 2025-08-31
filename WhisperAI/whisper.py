@@ -49,7 +49,7 @@ async def summarize_conversation (state: messagesState) -> messagesState:
         )
 
         msg = msg.format (summary=summary_message, conversation=messages)
-        response = await messageSummary_llm.ainvoke ([SystemMessage(content=summarizeMessagePrompt)] + HumanMessage(content=msg))
+        response = await messageSummary_llm.ainvoke ([SystemMessage(content=summarizeMessagePrompt)] + [HumanMessage(content=msg)])
 
         delete_messages = [RemoveMessage(id=m.id) for m in state['messages'][:-2]]
         return {'summary': response.summary, 'messages':delete_messages}
