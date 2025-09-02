@@ -165,6 +165,7 @@ async def anonymous_chat (message: ChatMessageIn):
         'title': thread_title,
         'role': 'whisper',
         'message': response,
+        'summarize': False,
         'timeStamp': timeStamp
     }
 
