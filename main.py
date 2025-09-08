@@ -13,7 +13,7 @@ app.include_router(journal_router)
 
 app.add_middleware(
     CORSMiddleware,
-    allow_origins=["*"],      # 1
+    allow_origins=["*", "http://localhost:5173"],      # 1
     allow_credentials=True,   # 2
     allow_methods=["*"],      # 3
     allow_headers=["*"],      # 4
