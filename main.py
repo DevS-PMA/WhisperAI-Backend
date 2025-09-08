@@ -7,14 +7,13 @@ from Backend.journal_router import journal_router
 
 app = FastAPI ()
 
-app.include_router(router=auth_router)
-app.include_router(router=chat_router)
-
-app.include_router(router=journal_router)
+app.include_router(auth_router, prefix="/auth")
+app.include_router(chat_router, prefix="/chat")
+app.include_router(journal_router, prefix="/journal")
 
 app.add_middleware(
     CORSMiddleware,
-    allow_origins=["*", "http://localhost:5173"],      # 1
+    allow_origins=["http://localhost:5173", "https://kyrahai.onrender.com", "https://kyrahai.onrender.com/whisper-ai/"],      # 1
     allow_credentials=True,   # 2
     allow_methods=["*"],      # 3
     allow_headers=["*"],      # 4
