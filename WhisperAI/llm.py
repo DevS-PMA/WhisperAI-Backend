@@ -4,6 +4,9 @@ import os
 from dotenv import load_dotenv
 
 load_dotenv ()
+os.environ ['LANGSMITH_API_KEY'] = os.getenv ('LANGSMITH_API_KEY')
+os.environ ['LANGSMITH_TRACING'] = "true"
+os.environ ['LANGSMITH_PROJECT'] = "KyrahAI"
 os.environ["OPENAI_API_KEY"] = os.getenv("OPENAI_API_KEY")
 llm = ChatOpenAI (model="gpt-4.1-nano")
 small_llm = ChatOpenAI (model="gpt-4.1-nano")
