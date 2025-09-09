@@ -142,7 +142,8 @@ summary_decision_prompt = """
 You are tasked with deciding if a user wants a message summary or not.
 You will be given the users input message and you will decide if the user wants a summary or its a normal conversation message.
 You need to read the user message clearly to understand what they actually wants.
-You are to return True if the user wants a conversation and a False if its a usual chat message.
+You are to return True if the user wants a summary and a False if its a usual conversation message message.
+You are to think before responding so you wont make a mistake of returning true when its a normal conversation.
 """
 
 summarizeChatPrompt = (
