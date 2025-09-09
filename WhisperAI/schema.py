@@ -23,4 +23,4 @@ class ListIssues (BaseModel):
     issues: List[Issue]
 
 class Summarize (BaseModel):
-    summarize: bool = Field(description="A flag indicator if the user want a message summary. True for summary, False for No summary.")
+    summarize: bool = Field(description="A flag indicator if the user want a summary. True if the user wants a summary, False for normal conversation.")
