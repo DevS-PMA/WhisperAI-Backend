@@ -139,6 +139,18 @@ Here is the previous summary of the chat. (It might be empty): {summary}
 """
 
 summary_decision_prompt = """
+You are an AI classifier. Read the user's message and decide whether they are asking for a summary.
+
+Rules:
+1. OUTPUT ONLY a single JSON object matching this schema: {"summarize": true|false}
+2. Return true when the user explicitly or implicitly requests a summary or summarization of your conversation with the user.
+3. Return false when the user is continuing the conversation, asking unrelated questions, providing info, or requesting a detailed explanation or examples.
+4. For ambiguous or unclear messages, return false (prefer not to summarize unless intent is clear).
+5. Do not output anything besides the JSON. No explanation, no extra text, no trailing whitespace.
+6. Think about the user's intent before deciding.
+"""
+
+summary_decision_prompt1 = """
 You are tasked with deciding if a user wants a message summary or not.
 You will be given the users input message and you will decide if the user wants a summary or its a normal conversation message.
 You need to read the user message clearly to understand what they actually wants.
