@@ -18,7 +18,7 @@ async def decide_operation (state: messagesState) -> messagesState:
     msg = state['messages'][-1]
     result = await summarize_llm.ainvoke ([SystemMessage(content=summary_decision_prompt)] + [msg])
     print (result)
-    return {'userSummary':result.summarize}
+    return {'userSummary':False}
 
 async def decide_node (state:messagesState) -> str:
     if state['userSummary']:
@@ -35,7 +35,7 @@ async def summarize_conversation (state: messagesState) -> messagesState:
     summary = state.get('summary', '')
     messages = state['messages']
 
-    if len(messages) > 8:
+    if len(messages) > 20:
         if summary:
             summary_message = summary
         else:
